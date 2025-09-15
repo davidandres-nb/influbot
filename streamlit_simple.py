@@ -136,15 +136,16 @@ def post_to_linkedin_direct(token, author_urn, commentary, image_paths=None, alt
         st.error(f"Error posting to LinkedIn: {str(e)}")
         return None
 
-def generate_image_direct(prompt_content, openai_api_key, model="gpt-image-1", size="1024x1024"):
+def generate_image_direct(post_content, openai_api_key, model="gpt-image-1", size="1024x1024", custom_prompt=None):
     """Generate AI image directly"""
     try:
         from image_generator import generate_linkedin_image
         return generate_linkedin_image(
-            post_content=prompt_content,
+            post_content=post_content,
             openai_api_key=openai_api_key,
             model=model,
-            size=size
+            size=size,
+            custom_prompt=custom_prompt
         )
     except Exception as e:
         st.error(f"Error generating image: {str(e)}")
@@ -446,16 +447,16 @@ def main():
             if generate_image:
                 st.markdown("#### Custom Image Prompt")
                 custom_image_prompt = st.text_area(
-                    "Image Prompt (Optional)",
-                    placeholder="Leave empty to use auto-generated prompt based on post content\n\nExample: Professional business meeting with modern office setting, clean and minimalist design, blue and white color scheme",
-                    help="Customize the image generation prompt. Leave empty to auto-generate based on post content.",
+                    "Additional Image Guidelines (Optional)",
+                    placeholder="Add specific visual guidelines to enhance the auto-generated prompt\n\nExample: Use blue and white color scheme, modern office setting, clean minimalist design, professional lighting",
+                    help="Add additional visual guidelines that will be combined with the auto-generated prompt based on post content.",
                     height=100
                 )
                 
                 if custom_image_prompt:
-                    st.info("💡 Using custom image prompt. The AI will generate an image based on your specific description.")
+                    st.info("💡 Using additional guidelines. The AI will combine your guidelines with the auto-generated prompt based on post content.")
                 else:
-                    st.info("🤖 Using auto-generated prompt based on post content.")
+                    st.info("🤖 Using standard auto-generated prompt based on post content.")
             
             # Submit button
             submitted = st.form_submit_button(
@@ -517,14 +518,12 @@ def main():
                         with st.spinner("Generating AI image..."):
                             openai_key = os.getenv('OPENAI_API_KEY')
                             if openai_key:
-                                # Use custom prompt if provided, otherwise use post content
-                                image_prompt = custom_image_prompt if custom_image_prompt else post_content
-                                
                                 generated_image_path = generate_image_direct(
-                                    image_prompt, 
+                                    post_content, 
                                     openai_key, 
                                     image_model, 
-                                    image_size
+                                    image_size,
+                                    custom_prompt=custom_image_prompt
                                 )
                                 if generated_image_path:
                                     st.success("✅ AI image generated successfully!")

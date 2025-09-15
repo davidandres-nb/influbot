@@ -15,6 +15,7 @@ def generate_linkedin_image(
     openai_api_key: str,
     model: str = "gpt-image-1",
     size: str = "1024x1024",
+    custom_prompt: Optional[str] = None,
     # quality: str = "standard",
     # style: str = "natural"
 ) -> str:
@@ -24,8 +25,9 @@ def generate_linkedin_image(
     Args:
         post_content: The LinkedIn post content to base the image on
         openai_api_key: OpenAI API key
-        model: OpenAI model to use (default: gpt-4o)
+        model: OpenAI model to use (default: gpt-image-1)
         size: Image size (default: 1024x1024 for square)
+        custom_prompt: Additional custom guidelines for image generation (optional)
         quality: Image quality (standard, hd)
         style: Image style (natural, vivid)
     
@@ -42,8 +44,8 @@ def generate_linkedin_image(
     # print(f"   Quality: {quality}")
     # print(f"   Style: {style}")
     
-    # Create the prompt for image generation
-    prompt = f"""Create a squared image to include together with the following post in LinkedIn. No text based. Nice, very visual and professional.
+    # Create the base prompt for image generation
+    base_prompt = f"""Create a squared image to include together with the following post in LinkedIn. No text based. Nice, very visual and professional.
 
 Post: {post_content}
 
@@ -54,6 +56,17 @@ Requirements:
 - Visually appealing and modern
 - Related to the post content theme
 - High quality and polished appearance"""
+
+    # Add custom prompt as additional guidelines if provided
+    if custom_prompt and custom_prompt.strip():
+        prompt = f"""{base_prompt}
+
+Additional Guidelines:
+{custom_prompt.strip()}"""
+        print(f"🎨 Using custom prompt guidelines: {custom_prompt[:100]}...")
+    else:
+        prompt = base_prompt
+        print("🤖 Using standard prompt based on post content")
     
     print(f"📝 Image prompt prepared ({len(prompt)} characters)")
     print(f"   Preview: {prompt[:200]}...")

@@ -156,19 +156,17 @@ async def generate_post(request: PostRequest):
         if request.generate_image:
             print(f"🎨 Image generation requested...")
             try:
-                # Use custom prompt if provided, otherwise use post content
-                image_prompt = request.custom_image_prompt if request.custom_image_prompt else post_content
-                
                 if request.custom_image_prompt:
-                    print(f"🎨 Using custom image prompt: {request.custom_image_prompt[:100]}...")
+                    print(f"🎨 Using custom prompt guidelines: {request.custom_image_prompt[:100]}...")
                 else:
-                    print("🤖 Using auto-generated prompt based on post content")
+                    print("🤖 Using standard prompt based on post content")
                 
                 generated_image_path = generate_linkedin_image(
-                    post_content=image_prompt,
+                    post_content=post_content,
                     openai_api_key=openai_key,
                     model=request.image_model,
-                    size=request.image_size
+                    size=request.image_size,
+                    custom_prompt=request.custom_image_prompt
                 )
                 print(f"✅ Image generated successfully!")
                 print(f"   Image path: {generated_image_path}")

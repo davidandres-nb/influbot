@@ -356,9 +356,9 @@ def main():
                     
                     # Custom image prompt
                     custom_image_prompt = st.text_area(
-                        "Custom Image Prompt (Optional)",
-                        placeholder="Leave empty to use auto-generated prompt based on post content\n\nExample: Professional business meeting with modern office setting, clean and minimalist design, blue and white color scheme",
-                        help="Customize the image generation prompt. Leave empty to auto-generate based on post content.",
+                        "Additional Image Guidelines (Optional)",
+                        placeholder="Add specific visual guidelines to enhance the auto-generated prompt\n\nExample: Use blue and white color scheme, modern office setting, clean minimalist design, professional lighting",
+                        help="Add additional visual guidelines that will be combined with the auto-generated prompt based on post content.",
                         height=80
                     )
             
