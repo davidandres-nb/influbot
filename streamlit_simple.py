@@ -130,7 +130,7 @@ def post_to_linkedin_direct(token, author_urn, commentary, image_paths=None, alt
         st.error(f"Error posting to LinkedIn: {str(e)}")
         return None
 
-def generate_image_direct(post_content, openai_api_key, model="gpt-4o", size="1024x1024"):
+def generate_image_direct(post_content, openai_api_key, model="gpt-image-1", size="1024x1024"):
     """Generate AI image directly"""
     try:
         from image_generator import generate_linkedin_image
@@ -355,7 +355,7 @@ def main():
                 if generate_image:
                     image_model = st.selectbox(
                         "Image Model",
-                        ["gpt-4o", "dall-e-3", "dall-e-2"],
+                        ["gpt-image-1", "dall-e-3", "dall-e-2"],
                         help="AI model to use for image generation"
                     )
                     

@@ -344,7 +344,7 @@ def main():
                 if generate_image:
                     image_model = st.selectbox(
                         "Image Model",
-                        ["gpt-4o", "dall-e-3", "dall-e-2"],
+                        ["gpt-image-1", "dall-e-3", "dall-e-2"],
                         help="AI model to use for image generation"
                     )
                     
