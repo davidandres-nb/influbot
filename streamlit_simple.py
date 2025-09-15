@@ -136,12 +136,12 @@ def post_to_linkedin_direct(token, author_urn, commentary, image_paths=None, alt
         st.error(f"Error posting to LinkedIn: {str(e)}")
         return None
 
-def generate_image_direct(post_content, openai_api_key, model="gpt-image-1", size="1024x1024"):
+def generate_image_direct(prompt_content, openai_api_key, model="gpt-image-1", size="1024x1024"):
     """Generate AI image directly"""
     try:
         from image_generator import generate_linkedin_image
         return generate_linkedin_image(
-            post_content=post_content,
+            post_content=prompt_content,
             openai_api_key=openai_api_key,
             model=model,
             size=size
@@ -161,7 +161,22 @@ def post_to_instagram_direct(image_path, caption, username=None, password=None):
             password=password
         )
     except Exception as e:
-        st.error(f"Error posting to Instagram: {str(e)}")
+        error_msg = str(e)
+        if "ChallengeRequired" in error_msg or "verification code" in error_msg.lower():
+            st.error("🔐 Instagram Security Challenge Required")
+            st.warning("""
+            Instagram has requested a security verification. This is normal for new logins.
+            
+            **To resolve this:**
+            1. Check your email for a verification code from Instagram
+            2. If you don't see it, check your spam folder
+            3. The verification code is usually 6 digits
+            4. Try logging in again after a few minutes
+            
+            **Note:** This challenge usually only happens once per device.
+            """)
+        else:
+            st.error(f"Error posting to Instagram: {error_msg}")
         return None
 
 def main():
@@ -427,6 +442,21 @@ def main():
                         help="Size of the generated image"
                     )
             
+            # Custom image prompt
+            if generate_image:
+                st.markdown("#### Custom Image Prompt")
+                custom_image_prompt = st.text_area(
+                    "Image Prompt (Optional)",
+                    placeholder="Leave empty to use auto-generated prompt based on post content\n\nExample: Professional business meeting with modern office setting, clean and minimalist design, blue and white color scheme",
+                    help="Customize the image generation prompt. Leave empty to auto-generate based on post content.",
+                    height=100
+                )
+                
+                if custom_image_prompt:
+                    st.info("💡 Using custom image prompt. The AI will generate an image based on your specific description.")
+                else:
+                    st.info("🤖 Using auto-generated prompt based on post content.")
+            
             # Submit button
             submitted = st.form_submit_button(
                 "🚀 Generate Post",
@@ -487,14 +517,19 @@ def main():
                         with st.spinner("Generating AI image..."):
                             openai_key = os.getenv('OPENAI_API_KEY')
                             if openai_key:
+                                # Use custom prompt if provided, otherwise use post content
+                                image_prompt = custom_image_prompt if custom_image_prompt else post_content
+                                
                                 generated_image_path = generate_image_direct(
-                                    post_content, 
+                                    image_prompt, 
                                     openai_key, 
                                     image_model, 
                                     image_size
                                 )
                                 if generated_image_path:
                                     st.success("✅ AI image generated successfully!")
+                                    if custom_image_prompt:
+                                        st.info(f"🎨 Used custom prompt: {custom_image_prompt[:100]}...")
                                 else:
                                     st.warning("⚠️ Image generation failed, continuing without image")
                             else:

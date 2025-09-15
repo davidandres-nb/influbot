@@ -353,6 +353,14 @@ def main():
                         ["1024x1024", "1792x1024", "1024x1792"],
                         help="Size of the generated image"
                     )
+                    
+                    # Custom image prompt
+                    custom_image_prompt = st.text_area(
+                        "Custom Image Prompt (Optional)",
+                        placeholder="Leave empty to use auto-generated prompt based on post content\n\nExample: Professional business meeting with modern office setting, clean and minimalist design, blue and white color scheme",
+                        help="Customize the image generation prompt. Leave empty to auto-generate based on post content.",
+                        height=80
+                    )
             
             # Submit button
             submitted = st.form_submit_button(
@@ -404,7 +412,8 @@ def main():
                 "visibility": "PUBLIC",
                 "generate_image": generate_image,
                 "image_model": image_model if generate_image else "gpt-4o",
-                "image_size": image_size if generate_image else "1024x1024"
+                "image_size": image_size if generate_image else "1024x1024",
+                "custom_image_prompt": custom_image_prompt if generate_image else None
             }
             
             # Show progress

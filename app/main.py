@@ -73,6 +73,7 @@ class PostRequest(BaseModel):
     generate_image: bool = False
     image_model: str = "gpt-4o"
     image_size: str = "1024x1024"
+    custom_image_prompt: Optional[str] = None
 
 class PostResponse(BaseModel):
     success: bool
@@ -155,8 +156,16 @@ async def generate_post(request: PostRequest):
         if request.generate_image:
             print(f"🎨 Image generation requested...")
             try:
+                # Use custom prompt if provided, otherwise use post content
+                image_prompt = request.custom_image_prompt if request.custom_image_prompt else post_content
+                
+                if request.custom_image_prompt:
+                    print(f"🎨 Using custom image prompt: {request.custom_image_prompt[:100]}...")
+                else:
+                    print("🤖 Using auto-generated prompt based on post content")
+                
                 generated_image_path = generate_linkedin_image(
-                    post_content=post_content,
+                    post_content=image_prompt,
                     openai_api_key=openai_key,
                     model=request.image_model,
                     size=request.image_size

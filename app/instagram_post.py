@@ -74,10 +74,26 @@ def login_client(username: str, password: str, settings_path: Path) -> Optional[
         except Exception as e:
             print(f"Could not load settings: {e}")
 
-    # Simple handler for challenge codes delivered by email/SMS
+    # Enhanced handler for challenge codes delivered by email/SMS
     def code_handler(username, choice):
-        print(f"A verification code was requested via {choice}.")
-        return input("Enter the code you received: ").strip()
+        print(f"\n🔐 Instagram Security Challenge")
+        print(f"📧 A verification code was requested via {choice}.")
+        print(f"📱 Please check your {choice.lower()} for the verification code.")
+        print(f"⏰ You have a few minutes to enter the code.")
+        
+        while True:
+            try:
+                code = input("🔢 Enter the verification code: ").strip()
+                if code and len(code) >= 4:  # Basic validation
+                    return code
+                else:
+                    print("❌ Please enter a valid code (at least 4 characters)")
+            except KeyboardInterrupt:
+                print("\n❌ Challenge cancelled by user")
+                return None
+            except Exception as e:
+                print(f"❌ Error reading input: {e}")
+                return None
 
     cl.challenge_code_handler = code_handler
 
