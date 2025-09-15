@@ -8,6 +8,7 @@ A comprehensive tool that generates LinkedIn posts using AI and optionally posts
 - **🤖 AI-Powered Post Generation**: Uses OpenAI to generate engaging LinkedIn posts based on search terms and topics
 - **📰 News Research**: Automatically researches recent news and articles related to your topic
 - **🔗 LinkedIn Integration**: Generate posts without posting them, or generate and post directly to LinkedIn
+- **📸 Instagram Integration**: Post generated content with images to Instagram
 - **🎨 AI Image Generation**: Optional AI-generated images to accompany your posts
 - **⚙️ Flexible Content Control**: Customize audience profile, language, tone, and content instructions
 - **🏢 Company Integration**: Include company information and focus in your posts
@@ -102,6 +103,10 @@ NEWSAPI_KEY=your_newsapi_key_here
 # Required for LinkedIn posting (optional)
 LINKEDIN_ACCESS_TOKEN=your_linkedin_access_token_here
 LINKEDIN_AUTHOR_URN=urn:li:person:your_linkedin_id_here
+
+# Required for Instagram posting (optional)
+IG_USERNAME=your_instagram_username_here
+IG_PASSWORD=your_instagram_password_here
 ```
 
 ### Getting API Keys
@@ -110,6 +115,7 @@ LINKEDIN_AUTHOR_URN=urn:li:person:your_linkedin_id_here
 - **EventRegistry**: Sign up at [EventRegistry](https://eventregistry.org/) for news search
 - **NewsAPI**: Alternative news source at [NewsAPI](https://newsapi.org/)
 - **LinkedIn**: Create an app at [LinkedIn Developers](https://developer.linkedin.com/) and get your access token
+- **Instagram**: Use your regular Instagram username and password (stored securely in environment variables)
 
 ## Web Interface Usage
 
@@ -168,6 +174,13 @@ The web interface includes collapsible advanced settings for:
 - **Image Support**: Upload images or generate AI images
 - **Visibility Control**: Choose between public and connections-only posts
 - **Real-time Status**: See posting status and get post URNs
+
+### Instagram Integration
+
+- **Image-based Posting**: Post generated content with AI-generated images
+- **Automatic Image Processing**: Resize and optimize images for Instagram
+- **Session Management**: Save login sessions to avoid repeated authentication
+- **Error Handling**: Robust handling of 2FA and security challenges
 
 ## API Endpoints
 

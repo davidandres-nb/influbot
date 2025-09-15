@@ -100,6 +100,12 @@ def check_linkedin_config():
     linkedin_urn = os.getenv('LINKEDIN_AUTHOR_URN')
     return linkedin_token, linkedin_urn
 
+def check_instagram_config():
+    """Check Instagram configuration"""
+    instagram_username = os.getenv('IG_USERNAME')
+    instagram_password = os.getenv('IG_PASSWORD')
+    return instagram_username, instagram_password
+
 def generate_post_direct(terms, topic, audience_profile, **kwargs):
     """Directly call the post generator without API"""
     try:
@@ -144,6 +150,20 @@ def generate_image_direct(post_content, openai_api_key, model="gpt-image-1", siz
         st.error(f"Error generating image: {str(e)}")
         return None
 
+def post_to_instagram_direct(image_path, caption, username=None, password=None):
+    """Directly post to Instagram without API"""
+    try:
+        from instagram_post import post_instagram_photo
+        return post_instagram_photo(
+            image_path=image_path,
+            caption=caption,
+            username=username,
+            password=password
+        )
+    except Exception as e:
+        st.error(f"Error posting to Instagram: {str(e)}")
+        return None
+
 def main():
     # Header
     st.markdown('<h1 class="main-header">🔗 LinkedIn Post Generator</h1>', unsafe_allow_html=True)
@@ -169,6 +189,15 @@ def main():
         else:
             st.warning("⚠️ LinkedIn credentials not configured")
             st.info("Set LINKEDIN_ACCESS_TOKEN and LINKEDIN_AUTHOR_URN in your .env file")
+        
+        # Instagram Configuration
+        st.markdown("### Instagram Configuration")
+        instagram_username, instagram_password = check_instagram_config()
+        if instagram_username and instagram_password:
+            st.success("✅ Instagram credentials configured")
+        else:
+            st.warning("⚠️ Instagram credentials not configured")
+            st.info("Set IG_USERNAME and IG_PASSWORD in your .env file")
         
         # Quick stats
         st.markdown("### Quick Stats")
@@ -315,19 +344,20 @@ def main():
                         help="Specific instructions for content generation"
                     )
             
-            # LinkedIn posting settings
-            st.markdown("### LinkedIn Posting")
+            # Social media posting settings
+            st.markdown("### Social Media Posting")
             
             col5, col6 = st.columns(2)
             
             with col5:
-                should_post = st.checkbox(
+                st.markdown("#### LinkedIn")
+                should_post_linkedin = st.checkbox(
                     "Post to LinkedIn",
                     value=False,
                     help="Whether to automatically post to LinkedIn after generation"
                 )
                 
-                if should_post:
+                if should_post_linkedin:
                     linkedin_token_input = st.text_input(
                         "LinkedIn Access Token",
                         value=linkedin_token or "",
@@ -346,6 +376,36 @@ def main():
                     linkedin_urn_input = ""
             
             with col6:
+                st.markdown("#### Instagram")
+                should_post_instagram = st.checkbox(
+                    "Post to Instagram",
+                    value=False,
+                    help="Whether to automatically post to Instagram after generation"
+                )
+                
+                if should_post_instagram:
+                    instagram_username_input = st.text_input(
+                        "Instagram Username",
+                        value=instagram_username or "",
+                        help="Your Instagram username"
+                    )
+                    
+                    instagram_password_input = st.text_input(
+                        "Instagram Password",
+                        value=instagram_password or "",
+                        type="password",
+                        help="Your Instagram password"
+                    )
+                else:
+                    instagram_username_input = ""
+                    instagram_password_input = ""
+            
+            # Image generation settings
+            st.markdown("### Image Generation")
+            
+            col7, col8 = st.columns(2)
+            
+            with col7:
                 generate_image = st.checkbox(
                     "Generate AI Image",
                     value=False,
@@ -358,7 +418,9 @@ def main():
                         ["gpt-image-1", "dall-e-3", "dall-e-2"],
                         help="AI model to use for image generation"
                     )
-                    
+            
+            with col8:
+                if generate_image:
                     image_size = st.selectbox(
                         "Image Size",
                         ["1024x1024", "1792x1024", "1024x1792"],
@@ -439,7 +501,7 @@ def main():
                                 st.error("❌ OpenAI API key not found for image generation")
                     
                     # Post to LinkedIn if requested
-                    if should_post and linkedin_token_input and linkedin_urn_input:
+                    if should_post_linkedin and linkedin_token_input and linkedin_urn_input:
                         with st.spinner("Posting to LinkedIn..."):
                             image_paths = [generated_image_path] if generated_image_path else None
                             alt_texts = ["AI-generated professional image"] if generated_image_path else None
@@ -458,6 +520,25 @@ def main():
                                 st.success(f"✅ Posted to LinkedIn successfully! Post URN: {post_urn}")
                             else:
                                 st.error("❌ Failed to post to LinkedIn")
+                    
+                    # Post to Instagram if requested
+                    if should_post_instagram and instagram_username_input and instagram_password_input:
+                        with st.spinner("Posting to Instagram..."):
+                            if generated_image_path:
+                                # Use the generated image
+                                instagram_url = post_to_instagram_direct(
+                                    image_path=generated_image_path,
+                                    caption=post_content,
+                                    username=instagram_username_input,
+                                    password=instagram_password_input
+                                )
+                                
+                                if instagram_url:
+                                    st.success(f"✅ Posted to Instagram successfully! URL: {instagram_url}")
+                                else:
+                                    st.error("❌ Failed to post to Instagram")
+                            else:
+                                st.warning("⚠️ Instagram posting requires an image. Please enable image generation.")
                     
                     # Clean up generated image
                     if generated_image_path and os.path.exists(generated_image_path):
@@ -483,7 +564,9 @@ def main():
             # "EVENTREGISTRY_API_KEY": "Required for news article search",
             "NEWSAPI_KEY": "Alternative to EventRegistry for news search",
             "LINKEDIN_ACCESS_TOKEN": "Required for posting to LinkedIn",
-            "LINKEDIN_AUTHOR_URN": "Required for posting to LinkedIn"
+            "LINKEDIN_AUTHOR_URN": "Required for posting to LinkedIn",
+            "IG_USERNAME": "Required for posting to Instagram",
+            "IG_PASSWORD": "Required for posting to Instagram"
         }
         
         for var, description in env_vars.items():
@@ -508,6 +591,12 @@ def main():
             st.success("✅ Image generator module loaded")
         except Exception as e:
             st.error(f"❌ Image generator module error: {e}")
+        
+        try:
+            from instagram_post import post_instagram_photo
+            st.success("✅ Instagram post module loaded")
+        except Exception as e:
+            st.error(f"❌ Instagram post module error: {e}")
     
     with tab3:
         st.markdown('<div class="section-header">Generated Content</div>', unsafe_allow_html=True)

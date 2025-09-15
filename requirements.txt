@@ -8,3 +8,5 @@ openai>=1.61.1
 eventregistry>=9.1
 ddgs>=4.0.0
 streamlit>=1.28.0
+schedule>=1.2.0
+instagrapi>=2.0.0
