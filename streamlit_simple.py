@@ -87,7 +87,7 @@ def check_environment():
     """Check if required environment variables are set"""
     required_vars = {
         'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
-        'EVENTREGISTRY_API_KEY': os.getenv('EVENTREGISTRY_API_KEY'),
+        # 'EVENTREGISTRY_API_KEY': os.getenv('EVENTREGISTRY_API_KEY'),
         'NEWSAPI_KEY': os.getenv('NEWSAPI_KEY'),
     }
     
@@ -480,7 +480,7 @@ def main():
         
         env_vars = {
             "OPENAI_API_KEY": "Required for AI content generation",
-            "EVENTREGISTRY_API_KEY": "Required for news article search",
+            # "EVENTREGISTRY_API_KEY": "Required for news article search",
             "NEWSAPI_KEY": "Alternative to EventRegistry for news search",
             "LINKEDIN_ACCESS_TOKEN": "Required for posting to LinkedIn",
             "LINKEDIN_AUTHOR_URN": "Required for posting to LinkedIn"
